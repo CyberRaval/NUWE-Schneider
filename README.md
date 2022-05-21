@@ -1,7 +1,7 @@
 # NUWE-Schneider
 
 # Team 5:
-- [Marzin](https://www.linkedin.com/in/martin-shell/)
+- [Marcin](https://www.linkedin.com/in/martin-shell/)
 - [Alex](https://www.linkedin.com/in/a96lex/)
 - [Cristina](https://www.linkedin.com/in/cristina-outeda-rua/)
 
@@ -14,7 +14,7 @@ We enable the machine to be exposed in our network by enabling the Bridge Adapte
 
 After, we run `sudo nmap -sV 192.168.1.138/24`. We know this ip adress because it is our wifi interface ip adress. We run the scan for the whole subnet.
 
-The output for the virtual machine is:
+Open ports in the VM's address:
 ```bash
 Nmap scan report for 192.168.1.145
 Host is up (0.00050s latency).
@@ -75,20 +75,17 @@ After checking all adresses in the browser, we found:
  After inspecting response headers, we see that the app is running a `Werkzeug/2.1.2` server with `Python/3.7.0`.
  We suppose we have found a Flask API. Calling the `/admin` endpoint returns the following message `Missing Authorization Header`. Since the `/admin` route exists, we also suspect this could be a `django` backend.
  
- By running `gobuster` we fond some interesting endpoints.
+ By running `gobuster` we found the API endpoints.
  ![image](https://user-images.githubusercontent.com/62766970/169664909-129aa774-1b41-45b0-a692-4b540c2a1092.png)
 
- 
- After some manual trial and error, we found that the `/index.php` route shows a "comment posting" interface.
 
 ## Stored XSS
 
-In the websote available at the `index.php` route, there is a comment box:
-
+After using `dir buster` on Kali Linux, we found the `/index.php` route that shows a "comment posting" input box.
 
 ![image](https://user-images.githubusercontent.com/62766970/169664619-800fe0e5-66d9-4fcc-b5e3-41bd79431ce3.png)
 
-We realised that is easy to embed custom HTML, thus javaScript code in the webpage by wrapping it in a `script`tag. We demonstrate it by adding an alert. 
+We realised that is easy to embed custom HTML, thus javaScript code in the webpage by wrapping it in a `<script>` tag. We demonstrate it by adding an alert. 
 
 We added 
 
@@ -102,12 +99,12 @@ Which results in:
 This messages persist across sessions and different devices, which means they are stored on the server.
 
 ## ALWAYS_CHECK_COMMITS
-We were able to access a wordpress server after sending a get request to `/robots.txt` and finding the following:
+We were able to access the wordpress page after sending a get request to `/robots.txt` and finding the following:
 
 ```
 # wp.geohome.com
 ```
-We add the following line to our `/etc/hosts´:
+We add the following line to our `/etc/hosts`, linking the DNS entry to IP address of the VM:
 
 ´´´
 192.168.1.148 wp.geohome.com
@@ -118,7 +115,7 @@ Then we can access the website using the https protocol through the browser.
 After being able to access the wordpress site hosted on the machine, we found at the very bottom of the page a github url.
 ![image](https://user-images.githubusercontent.com/62766970/169664833-6a354abd-43d7-45b0-8bb9-a5e03cb27d1a.png)
 
-Checking the commits message, we find a secret encoding key that was attempted to be removed in [this commit](https://github.com/geohome-dev/GeoAPI/commit/e82c17ed045e205a2ea07a354ae5b39c8b7d7ea0):
+Checking the commits history, we find a secret encoding key that was attempted to be removed in [this commit](https://github.com/geohome-dev/GeoAPI/commit/e82c17ed045e205a2ea07a354ae5b39c8b7d7ea0):
 
 ![unsafe!](https://user-images.githubusercontent.com/62766970/169665191-ba5bb4ed-bc6e-40da-b03f-b142355a43c4.png)
 
@@ -127,44 +124,21 @@ The encoding key is `Ge0HomeIsThePlaceWhereFantasyMeetsReality`
 
 We already knew the routes of the flask application, so the next step was easy :)
 
-We created a user called `marcin`, one of the teammates. We then used [jwt.io](https://jwt.io/) to decode, change the user name to `admin` and encode using the secret key:
+We created a user called `marcin`, one of the teammates. We then used [jwt.io](https://jwt.io/) to decode, change the user name to `admin` and sign it using the secret key:
 
 ![image](https://user-images.githubusercontent.com/62766970/169665148-ebcb6427-49f9-40f0-b0c8-4afe3a16ce2e.png)
 
 
-We then ping the `/admin endpoint` adding the token to the Authentication header and got this response:
+We then ping the `/admin` endpoint adding the token to the Authentication header and got this response:
 
 ![image](https://user-images.githubusercontent.com/62766970/169665133-e128d7e6-4e1e-40aa-a307-09c87e235049.png)
 
 
-Describe here the process to find the flag (you can include videos, images, etc)
+# Other vulnerabilities
 
-## FLAG_NAME_N
+## SQL usernames
 
-Describe here the process to find the flag (you can include videos, images, etc)
-
-We found open ports and software versions behind:
-
-```
-PORT     STATE SERVICE       VERSION
-53/tcp   open  domain        Simple DNS Plus
-80/tcp   open  http          Microsoft IIS httpd 10.0
-88/tcp   open  kerberos-sec  Microsoft Windows Kerberos (server time: 2022-05-21 12:41:19Z)
-135/tcp  open  msrpc         Microsoft Windows RPC
-139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
-389/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: geohome.com0., Site: Default-First-Site-Name)
-443/tcp  open  ssl/http      Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
-445/tcp  open  microsoft-ds?
-464/tcp  open  kpasswd5?
-593/tcp  open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
-636/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: geohome.com0., Site: Default-First-Site-Name)
-3268/tcp open  ldap          Microsoft Windows Active Directory LDAP (Domain: geohome.com0., Site: Default-First-Site-Name)
-3269/tcp open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: geohome.com0., Site: Default-First-Site-Name)
-3306/tcp open  mysql         MySQL 8.0.29
-5000/tcp open  upnp?
-```
-
-We found valid usernames in mysql:
+We found valid usernames in the mySQL open port using `mysql-enum` script in nmap:
 
 ```
 | mysql-enum:
@@ -181,7 +155,5 @@ We found valid usernames in mysql:
 |     web:<empty> - Valid credentials
 ```
 
-Performed a bruteforce against these usernames, no luck so far.
-
-Managed to get a session token from /register endpoint.
+We performed a bruteforce against these usernames using various password lists, but with no luck.
 
