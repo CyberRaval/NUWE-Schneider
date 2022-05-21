@@ -79,25 +79,6 @@ After checking all adresses in the browser, we found:
  ![image](https://user-images.githubusercontent.com/62766970/169664909-129aa774-1b41-45b0-a692-4b540c2a1092.png)
 
 
-## Stored XSS
-
-After using `dir buster` on Kali Linux, we found the `/index.php` route that shows a "comment posting" input box.
-
-![image](https://user-images.githubusercontent.com/62766970/169664619-800fe0e5-66d9-4fcc-b5e3-41bd79431ce3.png)
-
-We realised that is easy to embed custom HTML, thus javaScript code in the webpage by wrapping it in a `<script>` tag. We demonstrate it by adding an alert. 
-
-We added 
-
-```html
-<script>alert("Sí va a ser tan facil ajaj")</script>
-```
-Which results in:
-
-![image](https://user-images.githubusercontent.com/62766970/169664753-647d9691-b1b3-44b1-8f87-62ed6df59fa0.png)
-
-This messages persist across sessions and different devices, which means they are stored on the server.
-
 ## ALWAYS_CHECK_COMMITS
 We were able to access the wordpress page after sending a get request to `/robots.txt` and finding the following:
 
@@ -106,9 +87,7 @@ We were able to access the wordpress page after sending a get request to `/robot
 ```
 We add the following line to our `/etc/hosts`, linking the DNS entry to IP address of the VM:
 
-´´´
-192.168.1.148 wp.geohome.com
-´´´
+`192.168.1.148 wp.geohome.com`
 
 Then we can access the website using the https protocol through the browser.
 
@@ -134,7 +113,10 @@ We then ping the `/admin` endpoint adding the token to the Authentication header
 ![image](https://user-images.githubusercontent.com/62766970/169665133-e128d7e6-4e1e-40aa-a307-09c87e235049.png)
 
 
-# Flags captured having phisical access to the machine
+
+# Other vulnerabilities
+
+## Flags captured having phisical access to the machine
 
 At the beginning we got phisical access to the machine and inserted a cd disk containing trinity resque kit.
 
@@ -157,9 +139,6 @@ FLAG{update plugins!}
 We also find one flag per user:
 
 ![image](https://user-images.githubusercontent.com/62766970/169669365-0ad7f54c-7c7b-4a4b-9568-b1b22576122a.png)
-
-
-# Other vulnerabilities
 
 ## SQL usernames
 
@@ -185,4 +164,23 @@ We performed a bruteforce against these usernames using various password lists, 
 ## WP Admin (almost)credentials through WP plugin vulnerability
 
 Used `wpscan` to detect WP vulnerabilities. Found an SQL injection in WP-Survey. Using the PoC we managed to extract admin's username: `geoadmin` and his hashed password `$P$B41VrBpHl0HUjaJl7OVN1sSv08M1E7.` knowing it's hashed in SHA256 from sql-info script in nmap. 
+
+## Stored XSS
+
+After using `dir buster` on Kali Linux, we found the `/index.php` route that shows a "comment posting" input box.
+
+![image](https://user-images.githubusercontent.com/62766970/169664619-800fe0e5-66d9-4fcc-b5e3-41bd79431ce3.png)
+
+We realised that is easy to embed custom HTML, thus javaScript code in the webpage by wrapping it in a `<script>` tag. We demonstrate it by adding an alert. 
+
+We added 
+
+```html
+<script>alert("Sí va a ser tan facil ajaj")</script>
+```
+Which results in:
+
+![image](https://user-images.githubusercontent.com/62766970/169664753-647d9691-b1b3-44b1-8f87-62ed6df59fa0.png)
+
+This messages persist across sessions and different devices, which means they are stored on the server.
 
