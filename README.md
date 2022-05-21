@@ -97,9 +97,9 @@ We added
 ```
 Which results in:
 
-
 ![image](https://user-images.githubusercontent.com/62766970/169664753-647d9691-b1b3-44b1-8f87-62ed6df59fa0.png)
 
+This messages persist across sessions and different devices, which means they are stored on the server.
 
 ## ALWAYS_CHECK_COMMITS
 We were able to access a wordpress server after sending a get request to `/robots.txt` and finding the following:
