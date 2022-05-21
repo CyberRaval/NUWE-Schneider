@@ -1,12 +1,13 @@
 # NUWE-Schneider
 
-Team: 
-
-# Team 5
+# Team 5:
+- [Marzin](https://www.linkedin.com/in/martin-shell/)
+- [Alex](https://www.linkedin.com/in/a96lex/)
+- [Cristina](https://www.linkedin.com/in/cristina-outeda-rua/)
 
 Brief description here of the challenge
 
-## FLAG_NAME_1
+## Break into Windows
 
 Describe here the process to find the flag (you can include videos, images, etc)
 
