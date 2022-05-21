@@ -182,3 +182,7 @@ We found valid usernames in the mySQL open port using `mysql-enum` script in nma
 
 We performed a bruteforce against these usernames using various password lists, but with no luck.
 
+## WP Admin (almost)credentials through WP plugin vulnerability
+
+Used `wpscan` to detect WP vulnerabilities. Found an SQL injection in WP-Survey. Using the PoC we managed to extract admin's username: `geoadmin` and his hashed password `$P$B41VrBpHl0HUjaJl7OVN1sSv08M1E7.` knowing it's hashed in SHA256 from sql-info script in nmap. 
+
