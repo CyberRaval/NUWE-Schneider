@@ -134,6 +134,31 @@ We then ping the `/admin` endpoint adding the token to the Authentication header
 ![image](https://user-images.githubusercontent.com/62766970/169665133-e128d7e6-4e1e-40aa-a307-09c87e235049.png)
 
 
+# Flags captured having phisical access to the machine
+
+At the beginning we got phisical access to the machine and inserted a cd disk containing trinity resque kit.
+
+After gaining access we ran:
+
+```bash
+find | grep flag
+```
+
+And found very interesting results:
+![image](https://user-images.githubusercontent.com/62766970/169669153-8216189d-620a-4b11-9acf-7164b45f0c74.png)
+
+
+The file located at `ProgramData/Mysql` contains
+
+```bash
+FLAG{update plugins!}
+```
+
+We also find one flag per user:
+
+![image](https://user-images.githubusercontent.com/62766970/169669365-0ad7f54c-7c7b-4a4b-9568-b1b22576122a.png)
+
+
 # Other vulnerabilities
 
 ## SQL usernames
