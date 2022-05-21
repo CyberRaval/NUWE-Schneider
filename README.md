@@ -2,7 +2,7 @@
 
 Team: 
 
-# Team or user title
+# Team 5
 
 Brief description here of the challenge
 
